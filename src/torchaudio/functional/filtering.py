@@ -561,15 +561,19 @@ def _apply_probability_distribution(waveform: Tensor, density_function: str = "T
 
         gaussian = waveform[random_channel][random_time]
         for ws in num_rand_variables * [time_size]:
-            rand_chan = int(
-                torch.randint(
-                    channel_size,
-                    [
-                        1,
-                    ],
-                ).item()
+            rand_chan = (
+                int(
+                    torch.randint(
+                        channel_size,
+                        [
+                            1,
+                        ],
+                    ).item()
+                )
+                if channel_size > 0
+                else 0
             )
-            gaussian += waveform[rand_chan][
+            gaussian += waveform[rand_chan][(
                 int(
                     torch.randint(
                         ws,
@@ -578,7 +582,9 @@ def _apply_probability_distribution(waveform: Tensor, density_function: str = "T
                         ],
                     ).item()
                 )
-            ]
+                if channel_size > 0
+                else 0
+            )]
 
         signal_scaled_dis = signal_scaled + gaussian
     else:
